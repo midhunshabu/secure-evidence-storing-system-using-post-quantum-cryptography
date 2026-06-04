@@ -10,10 +10,6 @@ This project provides a full-stack evidence storing platform for controlled
 case handling. It includes role-based access, encrypted evidence storage,
 audit logging, case workflows, and administrator-managed user provisioning.
 
-The repository is published without local runtime data. Databases, uploaded
-evidence, audit logs, key vault files, backups, environment files, virtual
-environments, and dependency folders are intentionally excluded from Git.
-
 ## Features
 
 - Role-based access for administrators, investigators, and court users
