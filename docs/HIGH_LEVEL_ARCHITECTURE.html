@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PQC Evidence Storing System – High-Level Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0a0d14;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: rgba(255,255,255,0.07);
+    --text: #e2e8f0;
+    --muted: #64748b;
+
+    --blue:   #3b82f6;
+    --cyan:   #06b6d4;
+    --green:  #10b981;
+    --amber:  #f59e0b;
+    --purple: #8b5cf6;
+    --red:    #ef4444;
+    --pink:   #ec4899;
+
+    --user-color: var(--cyan);
+    --fe-color:   var(--blue);
+    --api-color:  var(--green);
+    --pqc-color:  var(--purple);
+    --data-color: var(--amber);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Background grid ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 48px 24px; }
+
+  /* ── Header ── */
+  header { text-align: center; margin-bottom: 60px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(139,92,246,.15); border: 1px solid rgba(139,92,246,.3);
+    color: #c4b5fd; border-radius: 100px; padding: 6px 16px;
+    font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .badge::before { content: '🔐'; }
+  h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 800; line-height: 1.15;
+    background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .subtitle { color: var(--muted); margin-top: 12px; font-size: 16px; }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 16px;
+    margin-bottom: 48px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 14px; font-size: 13px;
+  }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── Main diagram ── */
+  .diagram {
+    display: flex; flex-direction: column; gap: 0;
+    position: relative;
+  }
+
+  /* Arrow connector between layers */
+  .connector {
+    display: flex; justify-content: center; align-items: center;
+    height: 56px; position: relative;
+  }
+  .connector-line {
+    position: absolute; left: 50%; top: 0; bottom: 0;
+    width: 2px; background: linear-gradient(to bottom, transparent, var(--border), transparent);
+  }
+  .connector-arrow {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    z-index: 2;
+  }
+  .connector-label {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 100px; padding: 4px 12px;
+    font-size: 11px; font-weight: 500; color: var(--muted);
+    white-space: nowrap;
+  }
+  .arrow-icon { color: var(--muted); font-size: 16px; line-height: 1; }
+
+  /* ── Layer card ── */
+  .layer {
+    border-radius: 16px; border: 1px solid var(--border);
+    background: var(--surface);
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .layer:hover { transform: translateY(-2px); }
+
+  .layer-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 18px 24px; border-bottom: 1px solid var(--border);
+  }
+  .layer-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .layer-title { font-size: 15px; font-weight: 700; }
+  .layer-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .layer-body { padding: 20px 24px; }
+
+  /* Component grid inside layer */
+  .comp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .comp {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px;
+    cursor: default;
+    transition: border-color .2s, background .2s;
+  }
+  .comp:hover { border-color: rgba(255,255,255,.18); background: #1e2d44; }
+  .comp-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .comp-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+  .comp-tag  {
+    display: inline-block; margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    padding: 2px 7px; border-radius: 4px;
+    background: rgba(255,255,255,.06); color: var(--muted);
+  }
+
+  /* Layer accent colours */
+  .layer-user   { --accent: var(--user-color); }
+  .layer-fe     { --accent: var(--fe-color);   }
+  .layer-api    { --accent: var(--api-color);  }
+  .layer-pqc    { --accent: var(--pqc-color);  }
+  .layer-data   { --accent: var(--data-color); }
+
+  .layer { box-shadow: 0 0 0 0 var(--accent); }
+  .layer:hover { box-shadow: 0 8px 40px -8px color-mix(in srgb, var(--accent) 30%, transparent); }
+  .layer-header { border-bottom-color: color-mix(in srgb, var(--accent) 20%, var(--border)); }
+  .layer-icon   { background: color-mix(in srgb, var(--accent) 15%, transparent);
+                  color: var(--accent); }
+  .layer-title  { color: var(--accent); }
+  .comp-tag     { color: var(--accent) !important; background: color-mix(in srgb, var(--accent) 10%, transparent) !important; }
+
+  /* ── Data flow table ── */
+  .flow-section { margin-top: 60px; }
+  .section-title {
+    font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .flow-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .flow-table th {
+    background: var(--surface2); text-align: left;
+    padding: 12px 16px; font-weight: 600; font-size: 11px;
+    letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .flow-table td {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    vertical-align: top; line-height: 1.5;
+  }
+  .flow-table tr:hover td { background: rgba(255,255,255,.02); }
+  .pill {
+    display: inline-block; padding: 2px 9px; border-radius: 100px;
+    font-size: 11px; font-weight: 600;
+  }
+
+  /* ── Tech stack ── */
+  .tech-grid {
+    display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;
+  }
+  .tech-chip {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 500;
+  }
+  .tech-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  footer { text-align: center; margin-top: 60px; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <header>
+    <div class="badge">High-Level Architecture</div>
+    <h1>PQC Evidence Storing System</h1>
+    <p class="subtitle">Post-Quantum Cryptography · Secure Evidence Management · Role-Based Access Control</p>
+  </header>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:var(--cyan)"></span>User Roles</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--blue)"></span>Presentation Layer</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>API / Application Layer</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span>PQC Security Layer</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--amber)"></span>Data &amp; Storage Layer</div>
+  </div>
+
+  <!-- Diagram -->
+  <div class="diagram">
+
+    <!-- LAYER 1: Users -->
+    <div class="layer layer-user">
+      <div class="layer-header">
+        <div class="layer-icon">👥</div>
+        <div>
+          <div class="layer-title">User / Actor Layer</div>
+          <div class="layer-sub">Human roles that interact with the system</div>
+        </div>
+      </div>
+      <div class="layer-body">
+        <div class="comp-grid">
+          <div class="comp">
+            <div class="comp-name">👮 Police Officer</div>
+            <div class="comp-desc">Uploads evidence files and case information into the system.</div>
+            <span class="comp-tag">role: police</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">🏛️ Court User</div>
+            <div class="comp-desc">Views, verifies, and reviews submitted evidence for legal proceedings.</div>
+            <span class="comp-tag">role: court_user</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">⚙️ System Admin</div>
+            <div class="comp-desc">Manages users, monitors alerts, reviews PQID access, and oversees system health.</div>
+            <span class="comp-tag">role: admin</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connector 1 -->
+    <div class="connector">
+      <div class="connector-line"></div>
+      <div class="connector-arrow">
+        <div class="connector-label">HTTPS · Browser Interaction</div>
+        <div class="arrow-icon">↕</div>
+      </div>
+    </div>
+
+    <!-- LAYER 2: Frontend -->
+    <div class="layer layer-fe">
+      <div class="layer-header">
+        <div class="layer-icon">⚛️</div>
+        <div>
+          <div class="layer-title">Presentation Layer — React Frontend</div>
+          <div class="layer-sub">react-app/src/components/ · Vite · SPA</div>
+        </div>
+      </div>
+      <div class="layer-body">
+        <div class="comp-grid">
+          <div class="comp">
+            <div class="comp-name">🔑 Login / Register</div>
+            <div class="comp-desc">JWT-based auth forms with role-aware routing.</div>
+            <span class="comp-tag">Login.jsx · Register.jsx</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">📊 Dashboard</div>
+            <div class="comp-desc">Overview of cases, evidence count, and status indicators.</div>
+            <span class="comp-tag">Dashboard.jsx</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">📁 Evidence Manager</div>
+            <div class="comp-desc">Upload, view, download, and verify evidence. Largest UI module.</div>
+            <span class="comp-tag">Evidence.jsx</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">🛡️ Admin Panel</div>
+            <div class="comp-desc">User management, alert center, PQID access review.</div>
+            <span class="comp-tag">Admin.jsx</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">🔗 API Client</div>
+            <div class="comp-desc">Centralised Axios wrapper for all REST calls to the backend.</div>
+            <span class="comp-tag">api.js</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">🧭 Navigation</div>
+            <div class="comp-desc">Role-sensitive navbar and collapsible sidebar.</div>
+            <span class="comp-tag">Navbar.jsx · Sidebar.jsx</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connector 2 -->
+    <div class="connector">
+      <div class="connector-line"></div>
+      <div class="connector-arrow">
+        <div class="connector-label">REST API · JSON · JWT Auth · Port 5000</div>
+        <div class="arrow-icon">↕</div>
+      </div>
+    </div>
+
+    <!-- LAYER 3: Backend API -->
+    <div class="layer layer-api">
+      <div class="layer-header">
+        <div class="layer-icon">🐍</div>
+        <div>
+          <div class="layer-title">Application / API Layer — Python Backend</div>
+          <div class="layer-sub">backend/app/ · Flask · Gunicorn · WSGI</div>
+        </div>
+      </div>
+      <div class="layer-body">
+        <div class="comp-grid">
+          <div class="comp">
+            <div class="comp-name">🔐 Auth Routes</div>
+            <div class="comp-desc">Login, register, JWT issue &amp; refresh, role validation.</div>
+            <span class="comp-tag">routes/auth.py</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">📋 Evidence Routes</div>
+            <div class="comp-desc">Upload, retrieve, verify, and download evidence via API.</div>
+            <span class="comp-tag">routes/evidence.py</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">⚙️ Admin Routes</div>
+            <div class="comp-desc">User CRUD, role assignments, alert management, PQID lookup.</div>
+            <span class="comp-tag">routes/admin.py</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">🗂️ Data Models</div>
+            <div class="comp-desc">ORM models: User, Evidence, CaseFile, CaseBookPage, CourtAccess, AuditLog.</div>
+            <span class="comp-tag">models/</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">🔑 Key Vault</div>
+            <div class="comp-desc">Secure storage and retrieval of per-user PQC key pairs.</div>
+            <span class="comp-tag">security/key_vault.py</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">🩺 System Heartbeat</div>
+            <div class="comp-desc">Health-check endpoint and system status monitor.</div>
+            <span class="comp-tag">models/system_heartbeat.py</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connector 3 -->
+    <div class="connector">
+      <div class="connector-line"></div>
+      <div class="connector-arrow">
+        <div class="connector-label">Hash · Sign · Encrypt · Verify · Key Encapsulation</div>
+        <div class="arrow-icon">↕</div>
+      </div>
+    </div>
+
+    <!-- LAYER 4: PQC -->
+    <div class="layer layer-pqc">
+      <div class="layer-header">
+        <div class="layer-icon">🔮</div>
+        <div>
+          <div class="layer-title">Post-Quantum Security Layer</div>
+          <div class="layer-sub">backend/app/modules/pqc_engine.py · liboqs · cryptography</div>
+        </div>
+      </div>
+      <div class="layer-body">
+        <div class="comp-grid">
+          <div class="comp">
+            <div class="comp-name">🔑 Key Encapsulation (KEM)</div>
+            <div class="comp-desc">ML-KEM-768 / Kyber512 for quantum-safe key exchange between parties.</div>
+            <span class="comp-tag">encapsulate · decapsulate</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">✍️ Digital Signatures</div>
+            <div class="comp-desc">ML-DSA-65 / Dilithium3 to sign and verify evidence authenticity.</div>
+            <span class="comp-tag">sign · verify</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">🔒 AES-256-GCM Encryption</div>
+            <div class="comp-desc">Symmetric encryption for evidence files using KEM-derived keys.</div>
+            <span class="comp-tag">encrypt_evidence · decrypt_evidence</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">🔗 Audit Log Hash Chain</div>
+            <div class="comp-desc">Tamper-evident chained SHA-256 hashes forming an immutable audit trail.</div>
+            <span class="comp-tag">models/audit_log.py</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">🧪 HKDF Key Derivation</div>
+            <div class="comp-desc">Derives 256-bit AES keys from KEM shared secrets using HKDF-SHA256.</div>
+            <span class="comp-tag">derive_aes_key</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">🛡️ Keypair Generation</div>
+            <div class="comp-desc">On-demand PQC keypair generation for each user at registration.</div>
+            <span class="comp-tag">generate_keypair</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connector 4 -->
+    <div class="connector">
+      <div class="connector-line"></div>
+      <div class="connector-arrow">
+        <div class="connector-label">SQLAlchemy ORM · File I/O</div>
+        <div class="arrow-icon">↕</div>
+      </div>
+    </div>
+
+    <!-- LAYER 5: Data -->
+    <div class="layer layer-data">
+      <div class="layer-header">
+        <div class="layer-icon">🗄️</div>
+        <div>
+          <div class="layer-title">Data &amp; Storage Layer</div>
+          <div class="layer-sub">SQLite (dev) / PostgreSQL (prod) · Encrypted File Store · Logs</div>
+        </div>
+      </div>
+      <div class="layer-body">
+        <div class="comp-grid">
+          <div class="comp">
+            <div class="comp-name">👤 Users Table</div>
+            <div class="comp-desc">Credentials, roles, PQID, PQC public key, registration timestamps.</div>
+            <span class="comp-tag">models/user.py</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">📄 Evidence Table</div>
+            <div class="comp-desc">Evidence metadata: case ID, filename, hash, signature, uploader.</div>
+            <span class="comp-tag">models/evidence.py</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">📂 Case Files &amp; Book</div>
+            <div class="comp-desc">Structured case hierarchy with multiple pages per case.</div>
+            <span class="comp-tag">case_file.py · case_book_page.py</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">🏛️ Court Access Table</div>
+            <div class="comp-desc">Tracks which court users have been granted access to specific cases.</div>
+            <span class="comp-tag">models/court_access.py</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">📜 Audit Log Table</div>
+            <div class="comp-desc">Chained log of all system events — tamper-evident hash chain.</div>
+            <span class="comp-tag">models/audit_log.py</span>
+          </div>
+          <div class="comp">
+            <div class="comp-name">📁 Encrypted File Store</div>
+            <div class="comp-desc">AES-256-GCM encrypted evidence files on disk with per-file IV &amp; tag.</div>
+            <span class="comp-tag">backend/storage/</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end diagram -->
+
+  <!-- Data Flow Table -->
+  <div class="flow-section">
+    <div class="section-title">Key Data Flows</div>
+    <table class="flow-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Scenario</th>
+          <th>Flow</th>
+          <th>Security Mechanism</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><strong>User Registration</strong></td>
+          <td>React → Auth API → PQC Engine (keypair gen) → DB (user + pubkey)</td>
+          <td><span class="pill" style="background:rgba(139,92,246,.15);color:#c4b5fd;">ML-KEM + ML-DSA Keypair</span></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><strong>Evidence Upload</strong></td>
+          <td>React → Evidence API → PQC Engine (sign + encrypt) → File Store + DB</td>
+          <td><span class="pill" style="background:rgba(139,92,246,.15);color:#c4b5fd;">Dilithium Signature + AES-256-GCM</span></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><strong>Evidence Verification</strong></td>
+          <td>React → Evidence API → PQC Engine (verify signature) → Response</td>
+          <td><span class="pill" style="background:rgba(16,185,129,.15);color:#6ee7b7;">Signature Verification</span></td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td><strong>Evidence Download</strong></td>
+          <td>React → Evidence API → File Store → PQC Engine (decrypt) → React</td>
+          <td><span class="pill" style="background:rgba(16,185,129,.15);color:#6ee7b7;">AES-GCM Decrypt + Role Check</span></td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td><strong>Admin PQID Lookup</strong></td>
+          <td>Admin Panel → Admin API → System Password Verify → DB (PQID) → Audit Log</td>
+          <td><span class="pill" style="background:rgba(239,68,68,.15);color:#fca5a5;">Password Gate + Audit Log</span></td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td><strong>Court Access Grant</strong></td>
+          <td>Admin → Admin API → DB (CourtAccess record) → Audit Log entry</td>
+          <td><span class="pill" style="background:rgba(245,158,11,.15);color:#fcd34d;">RBAC + Audit Trail</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Tech Stack -->
+  <div class="flow-section">
+    <div class="section-title">Technology Stack</div>
+    <div class="tech-grid">
+      <div class="tech-chip"><span class="tech-dot" style="background:var(--blue)"></span>React.js (Vite)</div>
+      <div class="tech-chip"><span class="tech-dot" style="background:var(--green)"></span>Python / Flask</div>
+      <div class="tech-chip"><span class="tech-dot" style="background:var(--purple)"></span>liboqs (Open Quantum Safe)</div>
+      <div class="tech-chip"><span class="tech-dot" style="background:var(--purple)"></span>ML-KEM-768 (Kyber)</div>
+      <div class="tech-chip"><span class="tech-dot" style="background:var(--purple)"></span>ML-DSA-65 (Dilithium)</div>
+      <div class="tech-chip"><span class="tech-dot" style="background:var(--cyan)"></span>AES-256-GCM</div>
+      <div class="tech-chip"><span class="tech-dot" style="background:var(--amber)"></span>SQLite / SQLAlchemy</div>
+      <div class="tech-chip"><span class="tech-dot" style="background:var(--amber)"></span>Encrypted File Store</div>
+      <div class="tech-chip"><span class="tech-dot" style="background:var(--green)"></span>JWT Authentication</div>
+      <div class="tech-chip"><span class="tech-dot" style="background:var(--red)"></span>Gunicorn / WSGI</div>
+      <div class="tech-chip"><span class="tech-dot" style="background:var(--pink)"></span>HKDF-SHA256</div>
+      <div class="tech-chip"><span class="tech-dot" style="background:var(--muted)"></span>Audit Log Hash Chain</div>
+    </div>
+  </div>
+
+  <footer>
+    <p>PQC Evidence Storing System &mdash; High-Level Architecture &mdash; Generated 2026</p>
+  </footer>
+
+</div>
+</body>
+</html>

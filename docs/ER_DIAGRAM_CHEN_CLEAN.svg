@@ -1,0 +1,217 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="950" viewBox="0 0 1600 950">
+  <defs>
+    <style>
+      .page { fill: #ffffff; }
+      .line { stroke: #222222; stroke-width: 2; fill: none; }
+      .entity { fill: #ffffff; stroke: #222222; stroke-width: 2.2; }
+      .relationship { fill: #ffffff; stroke: #222222; stroke-width: 2.2; }
+      .attribute { fill: #ffffff; stroke: #222222; stroke-width: 1.8; }
+      .entity-text { font-family: "Times New Roman", serif; font-size: 20px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; fill: #111111; }
+      .rel-text { font-family: "Times New Roman", serif; font-size: 17px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; fill: #111111; }
+      .attr-text { font-family: "Times New Roman", serif; font-size: 15px; text-anchor: middle; dominant-baseline: middle; fill: #111111; }
+      .card-text { font-family: "Times New Roman", serif; font-size: 15px; text-anchor: middle; dominant-baseline: middle; fill: #111111; }
+      .title { font-family: "Times New Roman", serif; font-size: 30px; font-weight: 700; text-anchor: middle; fill: #111111; }
+    </style>
+  </defs>
+
+  <rect class="page" x="0" y="0" width="1600" height="950"/>
+  <text class="title" x="800" y="54">Entity Relationship Diagram of PQC Evidence Storing System</text>
+
+  <!-- ================= USER ================= -->
+  <rect class="entity" x="95" y="310" width="240" height="78"/>
+  <text class="entity-text" x="215" y="349">USER</text>
+
+  <ellipse class="attribute" cx="74" cy="137" rx="60" ry="28"/>
+  <text class="attr-text" x="74" y="137">user_id PK</text>
+  <line class="line" x1="97" y1="163" x2="170" y2="310"/>
+
+  <ellipse class="attribute" cx="165" cy="96" rx="65" ry="28"/>
+  <text class="attr-text" x="165" y="96">username</text>
+  <line class="line" x1="173" y1="124" x2="205" y2="310"/>
+
+  <ellipse class="attribute" cx="268" cy="102" rx="54" ry="28"/>
+  <text class="attr-text" x="268" y="102">email</text>
+  <line class="line" x1="260" y1="130" x2="229" y2="310"/>
+
+  <ellipse class="attribute" cx="354" cy="143" rx="50" ry="28"/>
+  <text class="attr-text" x="354" y="143">role</text>
+  <line class="line" x1="333" y1="169" x2="263" y2="310"/>
+
+  <ellipse class="attribute" cx="40" cy="248" rx="50" ry="28"/>
+  <text class="attr-text" x="40" y="248">pqid</text>
+  <line class="line" x1="84" y1="262" x2="145" y2="310"/>
+
+  <ellipse class="attribute" cx="381" cy="248" rx="78" ry="28"/>
+  <text class="attr-text" x="381" y="248">public_key</text>
+  <line class="line" x1="326" y1="268" x2="276" y2="310"/>
+
+  <!-- ================= CASE FILE ================= -->
+  <rect class="entity" x="650" y="300" width="260" height="78"/>
+  <text class="entity-text" x="780" y="339">CASE FILE</text>
+
+  <ellipse class="attribute" cx="607" cy="119" rx="78" ry="28"/>
+  <text class="attr-text" x="607" y="119">case_id PK</text>
+  <line class="line" x1="630" y1="146" x2="720" y2="300"/>
+
+  <ellipse class="attribute" cx="724" cy="83" rx="90" ry="28"/>
+  <text class="attr-text" x="724" y="83">case_number</text>
+  <line class="line" x1="732" y1="111" x2="765" y2="300"/>
+
+  <ellipse class="attribute" cx="862" cy="90" rx="118" ry="28"/>
+  <text class="attr-text" x="862" y="90">quantum_ledger_no</text>
+  <line class="line" x1="850" y1="118" x2="804" y2="300"/>
+
+  <ellipse class="attribute" cx="1002" cy="135" rx="72" ry="28"/>
+  <text class="attr-text" x="1002" y="135">case_title</text>
+  <line class="line" x1="965" y1="160" x2="850" y2="300"/>
+
+  <ellipse class="attribute" cx="580" cy="232" rx="55" ry="28"/>
+  <text class="attr-text" x="580" y="232">status</text>
+  <line class="line" x1="625" y1="250" x2="690" y2="300"/>
+
+  <ellipse class="attribute" cx="989" cy="234" rx="92" ry="28"/>
+  <text class="attr-text" x="989" y="234">approval_status</text>
+  <line class="line" x1="924" y1="254" x2="869" y2="300"/>
+
+  <!-- ================= EVIDENCE ================= -->
+  <rect class="entity" x="1210" y="305" width="250" height="78"/>
+  <text class="entity-text" x="1335" y="344">EVIDENCE</text>
+
+  <ellipse class="attribute" cx="1138" cy="133" rx="86" ry="28"/>
+  <text class="attr-text" x="1138" y="133">evidence_id PK</text>
+  <line class="line" x1="1165" y1="160" x2="1264" y2="305"/>
+
+  <ellipse class="attribute" cx="1257" cy="82" rx="62" ry="28"/>
+  <text class="attr-text" x="1257" y="82">filename</text>
+  <line class="line" x1="1268" y1="110" x2="1312" y2="305"/>
+
+  <ellipse class="attribute" cx="1370" cy="83" rx="66" ry="28"/>
+  <text class="attr-text" x="1370" y="83">file_hash</text>
+  <line class="line" x1="1365" y1="111" x2="1340" y2="305"/>
+
+  <ellipse class="attribute" cx="1487" cy="130" rx="72" ry="28"/>
+  <text class="attr-text" x="1487" y="130">file_size</text>
+  <line class="line" x1="1460" y1="156" x2="1398" y2="305"/>
+
+  <ellipse class="attribute" cx="1134" cy="237" rx="88" ry="28"/>
+  <text class="attr-text" x="1134" y="237">evidence_type</text>
+  <line class="line" x1="1199" y1="256" x2="1255" y2="305"/>
+
+  <ellipse class="attribute" cx="1510" cy="236" rx="82" ry="28"/>
+  <text class="attr-text" x="1510" y="236">uploaded_at</text>
+  <line class="line" x1="1450" y1="256" x2="1404" y2="305"/>
+
+  <ellipse class="attribute" cx="1335" cy="198" rx="88" ry="28"/>
+  <text class="attr-text" x="1335" y="198">access_level</text>
+  <line class="line" x1="1335" y1="226" x2="1335" y2="305"/>
+
+  <!-- ================= TOP RELATIONSHIPS ================= -->
+  <polygon class="relationship" points="492,310 560,349 492,388 424,349"/>
+  <text class="rel-text" x="492" y="349">CREATES</text>
+  <line class="line" x1="335" y1="349" x2="424" y2="349"/>
+  <line class="line" x1="560" y1="349" x2="650" y2="349"/>
+  <text class="card-text" x="370" y="333">1</text>
+  <text class="card-text" x="620" y="333">N</text>
+
+  <polygon class="relationship" points="1062,305 1132,344 1062,383 992,344"/>
+  <text class="rel-text" x="1062" y="344">CONTAINS</text>
+  <line class="line" x1="910" y1="344" x2="992" y2="344"/>
+  <line class="line" x1="1132" y1="344" x2="1210" y2="344"/>
+  <text class="card-text" x="940" y="328">1</text>
+  <text class="card-text" x="1182" y="328">N</text>
+
+  <!-- ================= KEY VAULT ================= -->
+  <rect class="entity" x="135" y="700" width="250" height="78"/>
+  <text class="entity-text" x="260" y="739">KEY VAULT</text>
+
+  <ellipse class="attribute" cx="72" cy="619" rx="70" ry="28"/>
+  <text class="attr-text" x="72" y="619">vault_id PK</text>
+  <line class="line" x1="112" y1="642" x2="190" y2="700"/>
+
+  <ellipse class="attribute" cx="205" cy="590" rx="78" ry="28"/>
+  <text class="attr-text" x="205" y="590">kem_secret</text>
+  <line class="line" x1="217" y1="618" x2="246" y2="700"/>
+
+  <ellipse class="attribute" cx="342" cy="600" rx="76" ry="28"/>
+  <text class="attr-text" x="342" y="600">sig_secret</text>
+  <line class="line" x1="319" y1="627" x2="284" y2="700"/>
+
+  <ellipse class="attribute" cx="459" cy="653" rx="78" ry="28"/>
+  <text class="attr-text" x="459" y="653">stored_at</text>
+  <line class="line" x1="406" y1="674" x2="333" y2="700"/>
+
+  <polygon class="relationship" points="270,492 346,531 270,570 194,531"/>
+  <text class="rel-text" x="270" y="531">STORES</text>
+  <line class="line" x1="235" y1="388" x2="270" y2="492"/>
+  <line class="line" x1="270" y1="570" x2="270" y2="700"/>
+  <text class="card-text" x="251" y="428">1</text>
+  <text class="card-text" x="287" y="674">1</text>
+
+  <!-- ================= CASE ACCESS ================= -->
+  <rect class="entity" x="610" y="710" width="300" height="78"/>
+  <text class="entity-text" x="760" y="749">CASE ACCESS</text>
+
+  <ellipse class="attribute" cx="573" cy="608" rx="82" ry="28"/>
+  <text class="attr-text" x="573" y="608">access_id PK</text>
+  <line class="line" x1="612" y1="633" x2="700" y2="710"/>
+
+  <ellipse class="attribute" cx="705" cy="576" rx="58" ry="28"/>
+  <text class="attr-text" x="705" y="576">status</text>
+  <line class="line" x1="717" y1="604" x2="748" y2="710"/>
+
+  <ellipse class="attribute" cx="836" cy="583" rx="78" ry="28"/>
+  <text class="attr-text" x="836" y="583">expires_at</text>
+  <line class="line" x1="816" y1="611" x2="784" y2="710"/>
+
+  <ellipse class="attribute" cx="951" cy="636" rx="74" ry="28"/>
+  <text class="attr-text" x="951" y="636">reason</text>
+  <line class="line" x1="902" y1="660" x2="840" y2="710"/>
+
+  <polygon class="relationship" points="573,454 645,493 573,532 501,493"/>
+  <text class="rel-text" x="573" y="493">REQUESTS</text>
+  <line class="line" x1="290" y1="388" x2="501" y2="493"/>
+  <line class="line" x1="573" y1="532" x2="710" y2="710"/>
+  <text class="card-text" x="358" y="436">1</text>
+  <text class="card-text" x="679" y="677">N</text>
+
+  <polygon class="relationship" points="790,455 862,494 790,533 718,494"/>
+  <text class="rel-text" x="790" y="494">FOR</text>
+  <line class="line" x1="780" y1="378" x2="790" y2="455"/>
+  <line class="line" x1="790" y1="533" x2="790" y2="710"/>
+  <text class="card-text" x="800" y="414">1</text>
+  <text class="card-text" x="806" y="680">N</text>
+
+  <!-- ================= CUSTODY RECORD ================= -->
+  <rect class="entity" x="1185" y="710" width="290" height="78"/>
+  <text class="entity-text" x="1330" y="749">CUSTODY RECORD</text>
+
+  <ellipse class="attribute" cx="1086" cy="610" rx="82" ry="28"/>
+  <text class="attr-text" x="1086" y="610">custody_id PK</text>
+  <line class="line" x1="1133" y1="633" x2="1244" y2="710"/>
+
+  <ellipse class="attribute" cx="1237" cy="575" rx="56" ry="28"/>
+  <text class="attr-text" x="1237" y="575">action</text>
+  <line class="line" x1="1254" y1="603" x2="1304" y2="710"/>
+
+  <ellipse class="attribute" cx="1372" cy="579" rx="76" ry="28"/>
+  <text class="attr-text" x="1372" y="579">timestamp</text>
+  <line class="line" x1="1361" y1="607" x2="1339" y2="710"/>
+
+  <ellipse class="attribute" cx="1502" cy="631" rx="70" ry="28"/>
+  <text class="attr-text" x="1502" y="631">signature</text>
+  <line class="line" x1="1458" y1="656" x2="1396" y2="710"/>
+
+  <polygon class="relationship" points="1332,461 1404,500 1332,539 1260,500"/>
+  <text class="rel-text" x="1332" y="500">HAS LOG</text>
+  <line class="line" x1="1335" y1="383" x2="1332" y2="461"/>
+  <line class="line" x1="1332" y1="539" x2="1332" y2="710"/>
+  <text class="card-text" x="1349" y="424">1</text>
+  <text class="card-text" x="1350" y="680">N</text>
+
+  <polygon class="relationship" points="1042,634 1112,673 1042,712 972,673"/>
+  <text class="rel-text" x="1042" y="673">WRITES</text>
+  <line class="line" x1="335" y1="376" x2="972" y2="673"/>
+  <line class="line" x1="1112" y1="673" x2="1200" y2="710"/>
+  <text class="card-text" x="480" y="460">1</text>
+  <text class="card-text" x="1155" y="680">N</text>
+</svg>

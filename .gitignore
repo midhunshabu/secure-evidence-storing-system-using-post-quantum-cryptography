@@ -1,0 +1,41 @@
+# Environment files and local secrets
+.env
+backend/.env
+backend/.env.save
+react-app/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+venv/
+.venv/
+env/
+ENV/
+
+# Node / React
+node_modules/
+build/
+dist/
+.next/
+
+# Logs and runtime output
+logs/
+*.log
+
+# Local databases, backups, uploaded evidence, and encrypted runtime vaults
+*.db
+backend/instance/
+backend/backups/
+backend/storage/
+backend/secure/
+storage/
+
+# Local IDE/editor settings
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
